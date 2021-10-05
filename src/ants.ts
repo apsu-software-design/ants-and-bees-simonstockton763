@@ -10,6 +10,12 @@ export abstract class Insect {
   getPlace() { return this.place; }
   setPlace(place:Place){ this.place = place; }
 
+    /**
+     *  this method removes an amount from an ants armor and returns true if the ant runs out of armor.
+     *  
+     *  @param amount - the amount of damage the ant armor takes
+     *  @returns boolean true if ant is dead
+     */
   reduceArmor(amount:number):boolean {
     this.armor -= amount;
     if(this.armor <= 0){
@@ -47,6 +53,10 @@ export class Bee extends Insect {
 
   setStatus(status:string) { this.status = status; }
 
+    /**
+     *  this method checks to see if the bee can go into a tunnel, if so bee is placed in the tunnel
+     *  
+     */
   act() {
     if(this.isBlocked()){
       if(this.status !== 'cold') {
@@ -82,7 +92,11 @@ export class GrowerAnt extends Ant {
   constructor() {
     super(1,1)
   }
-
+    /**
+     *  this method decides which boost the grower ant gets for the colony 
+     *
+     *  @param colony - the colony given a boost by this ant
+     */
   act(colony:AntColony) {
     let roll = Math.random();
     if(roll < 0.6){
@@ -108,6 +122,10 @@ export class ThrowerAnt extends Ant {
     super(1,4);
   }
 
+    /**
+     *  this method finds a target for the ant to attack, and sets the target's status.
+     *  if bug spray is active, kills all nearby bees and the ant
+     */
   act() {
     if(this.boost !== 'BugSpray'){
       let target;
@@ -156,6 +174,11 @@ export class EaterAnt extends Ant {
     return this.stomach.getBees().length > 0;
   }
 
+    /**
+     *  this method has the eater ant eat the nearest bee. 
+     *  if it is currently eating a bee, it continues eating the bee.
+     *
+     */
   act() {
     console.log("eating: "+this.turnsEating);
     if(this.turnsEating == 0){
@@ -176,7 +199,12 @@ export class EaterAnt extends Ant {
         this.turnsEating++;
     }
   }  
-
+    /**
+     *  this method removes an ammount from an ants armor and returns true if the ant runs out of armor.
+     *
+     *  @param amount - the amount of damage the ant armor takes
+     *  @returns boolean true if ant is dead
+     */
   reduceArmor(amount:number):boolean {
     this.armor -= amount;
     console.log('armor reduced to: '+this.armor);
@@ -209,8 +237,12 @@ export class ScubaAnt extends Ant {
 
   constructor() {
     super(1,5)
-  }
+    }
 
+    /**
+         *  this method finds a target for the ant to attack, and sets the target's status.
+         *  if bug spray is active, kills all nearby bees and the ant
+         */
   act() {
     if(this.boost !== 'BugSpray'){
       let target;

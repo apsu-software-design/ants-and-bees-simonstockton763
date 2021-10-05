@@ -28,7 +28,11 @@ class Place {
   }
 
   getBees():Bee[] { return this.bees; }
-
+    /**
+     * this method finds the closest bee between minDistance and maxDistance, and returns the bee
+     * @param maxDistance - the furthest the bee is able to be
+     * @param minDistance - the closest the bee is able to be
+     */
   getClosestBee(maxDistance:number, minDistance:number = 0):Bee {
 		let p:Place = this;
 		for(let dist = 0; p!==undefined && dist <= maxDistance; dist++) {
@@ -39,7 +43,11 @@ class Place {
 		}
 		return undefined;
   }
-
+    /**
+     *  this adds an ant to the current location if able and returns true
+     *  if the ant is unable to be placed, the method returns false
+     * @param ant - the ant to be placed at this location
+     */
   addAnt(ant:Ant):boolean {
     if(ant instanceof GuardAnt) {
       if(this.guard === undefined){
@@ -56,7 +64,10 @@ class Place {
       }
     return false;
   }
-
+    /**
+     *  this removes the ant from the current location and returns it
+     *  if there is a guard ant at the location, only returns the guard ant
+     */
   removeAnt():Ant {
     if(this.guard !== undefined){
       let guard = this.guard;
@@ -74,7 +85,10 @@ class Place {
     this.bees.push(bee);
     bee.setPlace(this);
   }
-
+    /**
+     *  this takes a bee to removed and remoces it from the tunnel
+     *  @param bee - the bee too be removed
+     */
   removeBee(bee:Bee):void {
     var index = this.bees.indexOf(bee);
     if(index >= 0){
@@ -101,7 +115,10 @@ class Place {
       this.removeBee(insect);
     }
   }
-
+    /**
+     *  if this tunnel is full of water, removes the ant,
+     *  unless the ant is a scuba ant 
+     */
   act() {
     if(this.water){
       if(this.guard){
@@ -122,6 +139,13 @@ class Hive extends Place {
     super('Hive');
   }
 
+    /**
+     *  creates a wave using a specific number of bees and adds it to the turn counter 
+     *  
+     *  
+     *  @param attackTurn - the turn count used to add the wave to wave list
+     *  @param numBees - the number of bees to be put out in this wave
+     */
   addWave(attackTurn:number, numBees:number):Hive {
     let wave:Bee[] = [];
     for(let i=0; i<numBees; i++) {
@@ -132,7 +156,14 @@ class Hive extends Place {
     this.waves[attackTurn] = wave;
     return this;
   }
-  
+
+
+    /**
+     *  this method takes bees from the wave list and puts them in the ant colony
+     *  
+     *  @param colony - the colony to be invaded by the bees
+     *  @param currentTurn - the wave the game is currently on
+     */
   invade(colony:AntColony, currentTurn:number): Bee[]{
     if(this.waves[currentTurn] !== undefined) {
       this.waves[currentTurn].forEach((bee) => {
@@ -196,6 +227,10 @@ class AntColony {
 
   getBoosts():{[index:string]:number} { return this.boosts; }
 
+    /**
+     *  adds a boost to the boosts lists in the colony
+     * @param boost - the boost to be added
+     */
   addBoost(boost:string){
     if(this.boosts[boost] === undefined){
       this.boosts[boost] = 0;
@@ -203,7 +238,11 @@ class AntColony {
     this.boosts[boost] = this.boosts[boost]+1;
     console.log('Found a '+boost+'!');
   }
-
+    /**
+     *  this method deploys an ant at the location specified
+     * @param ant - the ant to be deployed
+     * @param place - the location for the ant to be deployed
+     */
   deployAnt(ant:Ant, place:Place):string {
     if(this.food >= ant.getFoodCost()){
       let success = place.addAnt(ant);
@@ -219,7 +258,11 @@ class AntColony {
   removeAnt(place:Place){
     place.removeAnt();
   }
-
+    /**
+     *  this method applies a boost at the given location
+     * @param boost - the boost to be applied
+     * @param place - where the boost will be applied
+     */
   applyBoost(boost:string, place:Place):string {
     if(this.boosts[boost] === undefined || this.boosts[boost] < 1) {
       return 'no such boost';
@@ -231,7 +274,9 @@ class AntColony {
     ant.setBoost(boost);
     return undefined;
   }
-
+    /**
+     * this method has each ant do its action
+     */
   antsAct() {
     this.getAllAnts().forEach((ant) => {
       if(ant instanceof GuardAnt) {
@@ -242,13 +287,17 @@ class AntColony {
       ant.act(this);
     });    
   }
-
+    /**
+    * this method has each bee do its action
+    */
   beesAct() {
     this.getAllBees().forEach((bee) => {
       bee.act();
     });
   }
-
+    /**
+    * this method has each location do its action
+    */
   placesAct() {
     for(let i=0; i<this.places.length; i++) {
       for(let j=0; j<this.places[i].length; j++) {
@@ -256,7 +305,9 @@ class AntColony {
       }
     }    
   }
-
+    /**
+    * this method returns all ants in the colony
+    */
   getAllAnts():Ant[] {
     let ants = [];
     for(let i=0; i<this.places.length; i++) {
@@ -268,7 +319,9 @@ class AntColony {
     }
     return ants;
   }
-
+    /**
+    * this method returns all bees in the colony
+    */
   getAllBees():Bee[] {
     var bees = [];
     for(var i=0; i<this.places.length; i++){
@@ -285,6 +338,9 @@ class AntGame {
   private turn:number = 0;
   constructor(private colony:AntColony, private hive:Hive){}
 
+    /**
+     * the standard turn order for  the game
+     */
   takeTurn() {
     console.log('');
     this.colony.antsAct();
@@ -297,6 +353,10 @@ class AntGame {
 
   getTurn() { return this.turn; }
 
+
+    /**
+     * returns true if all bees are defeated 
+     */
   gameIsWon():boolean|undefined {
     if(this.colony.queenHasBees()){
       return false;
@@ -307,6 +367,11 @@ class AntGame {
     return undefined;
   }
 
+    /**
+     *  the interface for deploying ants
+     * @param antType - the type of ant the user wants to deploy
+     * @param placeCoordinates - where the user wqnts to place the ant
+     */
   deployAnt(antType:string, placeCoordinates:string):string {
     let ant;
     switch(antType.toLowerCase()) {
@@ -332,7 +397,10 @@ class AntGame {
       return 'illegal location';
     }
   }
-
+    /**
+     *  the interface for the user removing ants
+     * @param placeCoordinates - the location for the user to remove an ant
+     */
   removeAnt(placeCoordinates:string):string {
     try {
       let coords = placeCoordinates.split(',');
@@ -343,7 +411,11 @@ class AntGame {
       return 'illegal location';
     }    
   }
-
+    /**
+     *  the interface for user deploying boosts
+     * @param boostType - the boost the user wishes to deploy
+     * @param placeCoordinates - thee location the boost is to be placed
+     */
   boostAnt(boostType:string, placeCoordinates:string):string {
     try {
       let coords = placeCoordinates.split(',');
